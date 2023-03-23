@@ -33,6 +33,20 @@ $ yarn run test:e2e
 # test coverage
 $ yarn run test:cov
 ```
+
+### Migrations
+
+```bash
+# drop database
+$ yarn db:drop
+
+# create migration
+$ yarn db:create src/migrations/CreateTags
+
+# run migration
+
+$ yarn db:migrate
+```
 ## License
 
 Nest is [MIT licensed](LICENSE).
