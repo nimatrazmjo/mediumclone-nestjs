@@ -4,7 +4,7 @@ const ORMConfig: PostgresConnectionOptions = {
     type: 'postgres',
     host: 'localhost',
     port: 5432,
-    username: 'mediumclone',
+    username: 'postgres',
     password: 'root',
     database: 'mediumclone',
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
