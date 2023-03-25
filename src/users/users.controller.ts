@@ -12,8 +12,11 @@ export class UsersController {
     constructor(private readonly userService: UsersService) {}
 
     @Get('/')
-    findCurrentUser(@Req() req: ExpressRequest): UserEntity {
-        return req?.user;
+    async findCurrentUser(@Req() req: ExpressRequest): Promise<IUserResponse> {
+        if (!req?.user) {
+            return null;
+        }
+        return await this.userService.formatUserResponse(req.user);
     }
 
     @Post('/')
