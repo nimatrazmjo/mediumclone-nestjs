@@ -7,6 +7,7 @@ import { UserEntity } from '../models/entities/user/user.entity';
 import { IUserResponse } from '../types/userResponse.interface';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { LoginDTO } from './dtos/login.dto';
+import { UpdateUserDTO } from './dtos/updateUser.dto';
 
 @Injectable()
 export class UsersService {
@@ -58,6 +59,15 @@ export class UsersService {
         if (!user) {
             throw new HttpException('User not found', HttpStatus.UNPROCESSABLE_ENTITY);
         }
+        return user;
+    }
+
+    async update(userEntity: UserEntity, {email, bio, image}: UpdateUserDTO): Promise<UserEntity> {
+        userEntity.email = email ?? userEntity.email;
+        userEntity.bio = bio ?? userEntity.bio;
+        userEntity.image = image ?? userEntity.image;
+
+        const user = await this.userRepository.save(userEntity);
         return user;
     }
 }
