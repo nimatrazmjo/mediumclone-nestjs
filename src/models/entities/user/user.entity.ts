@@ -1,6 +1,7 @@
 import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { randomBytes, scrypt as _script } from 'crypto';
 import { promisify } from 'util';
+import { createHashPasswordWithSalt } from '../../../helpers/authentication.helper';
 
 const scrypt = promisify(_script);
 
@@ -27,14 +28,6 @@ export class UserEntity {
 
     @BeforeInsert()
     async hashPassword() {
-
-        // Generate a random salt
-        const salt = randomBytes(8).toString('hex');
-
-        // Hash the password with the salt
-        const buf = (await scrypt(this.password, salt, 64)) as Buffer;
-
-        // Store the hashed password and salt in the database
-        this.password = `${buf.toString('hex')}.${salt}`;
+        this.password = await createHashPasswordWithSalt(this.password);
     }
 }
