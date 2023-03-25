@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Req, UsePipes, ValidationPipe } from '@nes
 import { UserEntity } from '../models/entities/user/user.entity';
 import { ExpressRequest } from '../types/expressRequest.interface';
 import { IUserResponse } from '../types/userResponse.interface';
+import { User } from './decorators/user.decorator';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { LoginDTO } from './dtos/login.dto';
 import { UsersService } from './users.service';
@@ -12,11 +13,11 @@ export class UsersController {
     constructor(private readonly userService: UsersService) {}
 
     @Get('/')
-    async findCurrentUser(@Req() req: ExpressRequest): Promise<IUserResponse> {
-        if (!req?.user) {
+    async findCurrentUser(@User() user: UserEntity | null): Promise<IUserResponse> {
+        if (!user) {
             return null;
         }
-        return await this.userService.formatUserResponse(req.user);
+        return await this.userService.formatUserResponse(user);
     }
 
     @Post('/')
