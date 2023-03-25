@@ -41,7 +41,7 @@ export class UsersService {
     }
 
     async login(loginDTO: LoginDTO): Promise<UserEntity> {
-        const user = await this.userRepository.findOneBy(({email: loginDTO.email}));
+        const user = await this.userRepository.findOne({where:{email: loginDTO.email}, select: ['id', 'email', 'username', 'password', 'bio', 'image']});
         if (!user) {
             throw new HttpException('User not found', HttpStatus.UNPROCESSABLE_ENTITY);
         }
@@ -53,4 +53,11 @@ export class UsersService {
         return user;
     }
 
+    async findUserById(id: number): Promise<UserEntity> {
+        const user = await this.userRepository.findOneBy({id});
+        if (!user) {
+            throw new HttpException('User not found', HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+        return user;
+    }
 }
