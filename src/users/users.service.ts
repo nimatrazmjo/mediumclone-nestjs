@@ -1,10 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { comparePassword } from '../helpers/authentication.helper';
 import JwtHelper from '../helpers/jwt.helper';
 import { UserEntity } from '../models/entities/user/user.entity';
 import { IUserResponse } from '../types/userResponse.interface';
 import { CreateUserDto } from './dtos/createUser.dto';
+import { LoginDTO } from './dtos/login.dto';
 
 @Injectable()
 export class UsersService {
@@ -37,4 +39,18 @@ export class UsersService {
             }
         }
     }
+
+    async login(loginDTO: LoginDTO): Promise<UserEntity> {
+        const user = await this.userRepository.findOneBy(({email: loginDTO.email}));
+        if (!user) {
+            throw new HttpException('User not found', HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        const isPasswordValid = await comparePassword(user.password, loginDTO.password);
+        if (!isPasswordValid) {
+            throw new HttpException('Invalid credentials', HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+        return user;
+    }
+
 }
