@@ -3,23 +3,23 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
-import { Article } from './entities/article.entity';
+import { ArticleEntity } from './entities/article.entity';
 
 @Injectable()
 export class ArticlesService {
   constructor(
-    @InjectRepository(Article) private readonly articleRepository: Repository<Article>
+    @InjectRepository(ArticleEntity) private readonly articleRepository: Repository<ArticleEntity>
   ) {}
-  create(createArticleDto: CreateArticleDto): Promise<Article> {
+  create(createArticleDto: CreateArticleDto): Promise<ArticleEntity> {
     const article = this.articleRepository.create(createArticleDto);
     return this.articleRepository.save(article);
   }
 
-  findAll(): Promise<Article[]> {
+  findAll(): Promise<ArticleEntity[]> {
     return this.articleRepository.find();
   }
 
-  findOne(id: number): Promise<Article> {
+  findOne(id: number): Promise<ArticleEntity> {
     return this.articleRepository.findOneBy({id});
   }
 

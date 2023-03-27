@@ -1,8 +1,9 @@
 import { IsNotEmpty } from 'class-validator';
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { UserEntity } from '../../models/entities/user/user.entity';
 
-@Entity()
-export class Article {
+@Entity({name: 'articles'})
+export class ArticleEntity {
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -33,6 +34,9 @@ export class Article {
     @Column()
     @IsNotEmpty()
     favoritesCount: number;
+
+    @ManyToOne(type => UserEntity, user => user.articles, { eager: true, onDelete: 'CASCADE', cascade: true })
+    author: UserEntity;
 
 
 }
