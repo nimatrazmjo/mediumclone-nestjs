@@ -7,8 +7,8 @@ const ORMConfig: PostgresConnectionOptions = {
     username: 'postgres',
     password: 'root',
     database: 'mediumclone',
-    entities: [__dirname + '/../**/*.entity{.ts,.js}'],
     synchronize: false,
+    entities: [__dirname + '/../**/*.entity{.ts,.js}'],
     migrations: [__dirname + '/../migrations/*{.ts,.js}']
 };
 
