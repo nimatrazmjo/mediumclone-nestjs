@@ -21,8 +21,8 @@ export class UsersService {
     }
 
     async create(createUserDTO: CreateUserDto): Promise<UserEntity> {
-        const userByEMail = this.userRepository.findOneBy({email: createUserDTO.email});
-        const userByUsername = this.userRepository.findOneBy({username: createUserDTO.username});
+        const userByEMail = await this.userRepository.findOneBy({email: createUserDTO.email});
+        const userByUsername = await this.userRepository.findOneBy({username: createUserDTO.username});
 
         if (userByEMail || userByUsername) {
             throw new HttpException('User already exists', HttpStatus.UNPROCESSABLE_ENTITY);

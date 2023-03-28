@@ -26,7 +26,6 @@ export default class JwtHelper {
     public static verifyToken(token: string): IPayload {
         try {
         const decoded = verify(token, process.env.JWT_SECRET || 'abc123');
-        console.log(decoded,'decoded');
         return decoded;
         } catch (error) {
         throw new Error(error);
