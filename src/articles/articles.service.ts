@@ -25,8 +25,8 @@ export class ArticlesService {
     return this.articleRepository.find();
   }
 
-  findOne(id: number): Promise<ArticleEntity> {
-    return this.articleRepository.findOneBy({id});
+  findOne(slug): Promise<ArticleEntity> {
+    return this.articleRepository.findOneBy({slug});
   }
 
   update(id: number, updateArticleDto: UpdateArticleDto): Promise<any> {

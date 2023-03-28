@@ -23,9 +23,10 @@ export class ArticlesController {
     return this.articlesService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.articlesService.findOne(+id);
+  @Get(':slug')
+  async findOne(@Param('slug') slug: string): Promise<IArticleResponse> {
+    const article = await this.articlesService.findOne(slug);
+    return this.articlesService.articleResponse(article);
   }
 
   @Patch(':id')
