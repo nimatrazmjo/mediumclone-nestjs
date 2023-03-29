@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 import { UserEntity } from '../models/entities/user/user.entity';
@@ -29,12 +29,32 @@ export class ArticlesService {
     return this.articleRepository.findOneBy({slug});
   }
 
-  update(id: number, updateArticleDto: UpdateArticleDto): Promise<any> {
-    return this.articleRepository.update({id}, updateArticleDto);
+  async update(id: number, currentUserId: number,updateArticleDto: UpdateArticleDto): Promise<ArticleEntity> {
+    const article = await this.articleRepository.findOneBy({id});
+    if (!article) {
+      throw new HttpException('Article not found', HttpStatus.NOT_FOUND);
+    }
+
+    if (article.author.id !== currentUserId) {
+      throw new HttpException('You are not the author of this article', HttpStatus.UNAUTHORIZED);
+    }
+
+    article.title = updateArticleDto.title;
+    article.description = updateArticleDto.description;
+    article.body = updateArticleDto.body;
+    return this.articleRepository.save(article);
   }
 
-  remove(id: number): Promise<DeleteResult> {
-    return this.articleRepository.delete({id});
+  async remove(slug: string, currentUserId: number): Promise<DeleteResult> {
+    const article = await this.articleRepository.findOneBy({slug});
+    if (!article) {
+      throw new HttpException('Article not found', HttpStatus.NOT_FOUND);
+    }
+
+    if (article.author.id !== currentUserId) {
+      throw new HttpException('You are not the author of this article', HttpStatus.UNAUTHORIZED);
+    }
+    return this.articleRepository.delete({id: article.id});
   }
 
   articleResponse(article: ArticleEntity): any {
