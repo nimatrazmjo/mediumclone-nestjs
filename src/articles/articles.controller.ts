@@ -27,6 +27,13 @@ export class ArticlesController {
     return this.articlesService.articleResponse(article);
   }
 
+  @Post(':slug/favorite')
+  @UseGuards(AuthGuard)
+  async favorite(@Param('slug') slug: string, @User('id') currentUserId: number): Promise<IArticleResponse> {
+    const article = await this.articlesService.favorite(slug, currentUserId);
+    return this.articlesService.articleResponse(article);
+  }
+
   @Get(':slug')
   async findOne(@Param('slug') slug: string): Promise<IArticleResponse> {
     const article = await this.articlesService.findOne(slug);

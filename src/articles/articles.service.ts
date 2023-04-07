@@ -11,7 +11,8 @@ import { ArticlesResponse } from './types/articles-response.interface';
 @Injectable()
 export class ArticlesService {
   constructor(
-    @InjectRepository(ArticleEntity) private readonly articleRepository: Repository<ArticleEntity>
+    @InjectRepository(ArticleEntity) private readonly articleRepository: Repository<ArticleEntity>,
+    @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
   ) {}
   create(createArticleDto: CreateArticleDto, user: UserEntity): Promise<ArticleEntity> {
     const article = new ArticleEntity();
@@ -23,19 +24,37 @@ export class ArticlesService {
     return this.articleRepository.save(article);
   }
 
+  async favorite(slug: string, currentUserId: number): Promise<ArticleEntity> {
+    const article = await this.articleRepository.findOneBy({slug});
+    const user = await this.userRepository.findOne({where: {id: currentUserId}, relations: ['favorites']});
+    if (!article) {
+      throw new HttpException('Article not found', HttpStatus.NOT_FOUND);
+    }
+
+    if (user.favorites.find(favorite => favorite.id === article.id)) {
+      throw new HttpException('Article already favorited', HttpStatus.BAD_REQUEST);
+    }
+
+    user.favorites.push(article);
+    article.favoritesCount++;
+    await this.userRepository.save(user);
+    await this.articleRepository.save(article);
+    return article;
+  }
+
   async findAll(userId: number, query: IQueryable): Promise<ArticlesResponse> {
     const { limit, offset, tag, author, favorited } = query;
     const qb = this.articleRepository.createQueryBuilder('article');
     qb.leftJoinAndSelect('article.author', 'author');
-    qb.leftJoinAndSelect('article.tags', 'tag');
+    // qb.leftJoinAndSelect('article.tags', 'tag');
 
     if (author) {
       qb.andWhere('author.username = :author', { author });
     }
 
-    if (tag) {
-      qb.andWhere('tag.tagList LIKE :tag', { tag: `%${tag}%` });
-    }
+    // if (tag) {
+    //   qb.andWhere('tag.tagList LIKE :tag', { tag: `%${tag}%` });
+    // }
 
     qb.orderBy('article.createdAt', 'DESC');
     qb.limit(limit);
