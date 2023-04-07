@@ -1,6 +1,7 @@
 import { IsNotEmpty } from 'class-validator';
-import { BeforeInsert, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { BeforeInsert, Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { UserEntity } from '../../models/entities/user/user.entity';
+import { TagEntity } from '../../models/entities/tag/tag.entity';
 
 @Entity({name: 'articles'})
 export class ArticleEntity {
@@ -43,6 +44,4 @@ export class ArticleEntity {
 
     @ManyToOne(type => UserEntity, user => user.articles, { eager: true, onDelete: 'CASCADE', cascade: true })
     author: UserEntity;
-
-
 }

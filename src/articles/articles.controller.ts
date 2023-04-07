@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UsePipes, ValidationPipe, Query } from '@nestjs/common';
 import { UserEntity } from '../models/entities/user/user.entity';
 import { User } from '../users/decorators/user.decorator';
 import { AuthGuard } from '../users/guards/auth.guard';
@@ -6,10 +6,18 @@ import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { IArticleResponse } from './types/article-response.interface';
+import { IQueryable } from './types/query.interface';
+import { ArticlesResponse } from './types/articles-response.interface';
 
 @Controller('articles')
 export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
+
+  @Get()
+  @UseGuards(AuthGuard)
+  async findAll( @User('id') currentUserId: number, @Query() query: IQueryable): Promise<ArticlesResponse> {
+    return  await this.articlesService.findAll(currentUserId, query);
+  }
 
   @Post()
   @UseGuards(AuthGuard)
@@ -17,11 +25,6 @@ export class ArticlesController {
   async create(@Body('article') createArticleDto: CreateArticleDto, @User() user: UserEntity): Promise<IArticleResponse> {
     const article = await this.articlesService.create(createArticleDto, user);
     return this.articlesService.articleResponse(article);
-  }
-
-  @Get()
-  findAll() {
-    return this.articlesService.findAll();
   }
 
   @Get(':slug')

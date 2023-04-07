@@ -48,7 +48,7 @@ export default class JwtHelper {
      **/
     public static async generateToken(payload: IPayload): Promise<string> {
         try {
-        const token = await sign(payload, process.env.JWT_SECRET || 'abc123', { expiresIn: '1h' });
+        const token = await sign(payload, process.env.JWT_SECRET || 'abc123', { expiresIn: '24h' });
         return token;
         } catch (error) {
         throw new Error(error);

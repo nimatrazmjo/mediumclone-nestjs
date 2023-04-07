@@ -5,6 +5,8 @@ import { UserEntity } from '../models/entities/user/user.entity';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { ArticleEntity } from './entities/article.entity';
+import { IQueryable } from './types/query.interface';
+import { ArticlesResponse } from './types/articles-response.interface';
 
 @Injectable()
 export class ArticlesService {
@@ -21,8 +23,28 @@ export class ArticlesService {
     return this.articleRepository.save(article);
   }
 
-  findAll(): Promise<ArticleEntity[]> {
-    return this.articleRepository.find();
+  async findAll(userId: number, query: IQueryable): Promise<ArticlesResponse> {
+    const { limit, offset, tag, author, favorited } = query;
+    const qb = this.articleRepository.createQueryBuilder('article');
+    qb.leftJoinAndSelect('article.author', 'author');
+    qb.leftJoinAndSelect('article.tags', 'tag');
+
+    if (author) {
+      qb.andWhere('author.username = :author', { author });
+    }
+
+    if (tag) {
+      qb.andWhere('tag.tagList LIKE :tag', { tag: `%${tag}%` });
+    }
+
+    qb.orderBy('article.createdAt', 'DESC');
+    qb.limit(limit);
+    qb.offset(offset);
+
+    const records = await qb.getMany();
+    const count = await qb.getCount();
+
+    return this.articlesResponse(records, count);
   }
 
   findOne(slug): Promise<ArticleEntity> {
@@ -59,5 +81,9 @@ export class ArticlesService {
 
   articleResponse(article: ArticleEntity): any {
     return { article }
+  }
+
+  articlesResponse(articles:ArticleEntity[], articlesCount: number): ArticlesResponse  {
+    return { articles, articlesCount };
   }
 }
