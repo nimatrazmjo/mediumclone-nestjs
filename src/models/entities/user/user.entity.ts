@@ -1,4 +1,4 @@
-import { BeforeInsert, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeInsert, Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { randomBytes, scrypt as _script } from 'crypto';
 import { promisify } from 'util';
 import { createHashPasswordWithSalt } from '../../../helpers/authentication.helper';
@@ -34,4 +34,8 @@ export class UserEntity {
 
     @OneToMany(type => ArticleEntity, articles => articles.author)
     articles: ArticleEntity[];
+
+    @ManyToMany(() => ArticleEntity)
+    @JoinTable()
+    favorites: ArticleEntity[];
 }
