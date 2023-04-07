@@ -42,6 +42,23 @@ export class ArticlesService {
     return article;
   }
 
+  async unfavorite(slug: string, currentUserId: number): Promise<ArticleEntity> {
+    const article = await this.articleRepository.findOneBy({slug});
+    const user = await this.userRepository.findOne({where: {id: currentUserId}, relations: ['favorites']});
+    if (!article) {
+      throw new HttpException('Article not found', HttpStatus.NOT_FOUND);
+    }
+
+    if (!user.favorites.find(favorite => favorite.id === article.id)) {
+      throw new HttpException('Article already unfavorited', HttpStatus.BAD_REQUEST);
+    }
+    user.favorites = user.favorites.filter(favorite => favorite.id !== article.id);
+    article.favoritesCount--;
+    await this.userRepository.save(user);
+    await this.articleRepository.save(article);
+    return article;
+  }
+
   async findAll(userId: number, query: IQueryable): Promise<ArticlesResponse> {
     const { limit, offset, tag, author, favorited } = query;
     const qb = this.articleRepository.createQueryBuilder('article');

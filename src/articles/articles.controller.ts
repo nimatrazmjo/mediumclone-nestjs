@@ -34,6 +34,13 @@ export class ArticlesController {
     return this.articlesService.articleResponse(article);
   }
 
+  @Delete(':slug/favorite')
+  @UseGuards(AuthGuard)
+  async unfavorite(@Param('slug') slug: string, @User('id') currentUserId: number): Promise<IArticleResponse> {
+    const article = await this.articlesService.unfavorite(slug, currentUserId);
+    return this.articlesService.articleResponse(article);
+  }
+
   @Get(':slug')
   async findOne(@Param('slug') slug: string): Promise<IArticleResponse> {
     const article = await this.articlesService.findOne(slug);
